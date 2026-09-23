@@ -90,7 +90,24 @@ for x in records:
 
     geo = x.get("geocode") or {}
 
-    if str(geo.get("province_code")) != PROVINCE_CODE:
+    province_code = label(
+        geo.get("province_code")
+    ).strip()
+
+    province_name = label(
+        geo.get("province_name")
+    ).strip()
+
+    # รับทั้งรหัสจังหวัด 72
+    # และชื่อจังหวัด
+    if (
+        province_code not in ("72", "072")
+        and province_name not in (
+            "สุพรรณบุรี",
+            "Suphan Buri",
+            "Suphanburi"
+        )
+    ):
         continue
 
     st = x.get("station") or {}
@@ -119,6 +136,8 @@ for x in records:
         seen[sid] = x
 
 
+print("API records:", len(records))
+print("Suphanburi stations:", len(seen))
 # --------------------------------------------------
 # สร้างข้อมูลสำหรับ dashboard
 # --------------------------------------------------
