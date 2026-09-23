@@ -35,7 +35,7 @@ for x in seen.values():
     st=x.get("station") or {}
     rows.append({
         "station_id": st.get("id"),
-        "name": st.get("tele_station_name") or st.get("station_name") or "ไม่ระบุสถานี",
+        "name": str(st.get("tele_station_name") or st.get("station_name") or "ไม่ระบุสถานี"),
         "waterlevel_datetime": x.get("waterlevel_datetime"),
         "waterlevel_msl": x.get("waterlevel_msl"),
         "waterlevel_m": x.get("waterlevel_m"),
