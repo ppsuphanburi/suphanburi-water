@@ -3,72 +3,831 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>สุพรรณบุรี Water Watch</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#172033;font-family:Arial,"Noto Sans Thai",sans-serif}
-header{background:#fff;border-bottom:1px solid #dfe5ee;padding:18px 16px;position:sticky;top:0;z-index:5}
-.wrap{max-width:1100px;margin:auto}.title{font-size:30px;font-weight:800}.sub{font-size:16px;color:#667085;margin-top:5px}
-.updated{margin-top:10px;font-size:15px}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#16a34a;margin-right:7px}
-main{padding:18px 16px 40px}.notice{background:#fff7d6;border:1px solid #f0d77a;border-radius:14px;padding:14px 16px;font-size:17px;line-height:1.5;margin-bottom:16px}
-.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.box{background:white;border-radius:16px;padding:16px;border:1px solid #e1e7ef}.num{font-size:34px;font-weight:800}.label{font-size:16px;color:#667085;margin-top:3px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.card{background:#fff;border:1px solid #dfe5ee;border-radius:18px;padding:17px}.station{font-size:21px;font-weight:800}.place{font-size:14px;color:#667085;margin-top:3px}.value{font-size:42px;font-weight:900;margin:15px 0 4px}.unit{font-size:15px;color:#667085}.status{display:inline-block;margin-top:12px;padding:7px 11px;border-radius:999px;font-weight:800;font-size:16px}.red{background:#fee2e2;color:#b91c1c}.yellow{background:#fef3c7;color:#92400e}.green{background:#dcfce7;color:#166534}.gray{background:#eef2f7;color:#475467}
-.meta{margin-top:12px;border-top:1px solid #edf0f4;padding-top:10px;font-size:14px;line-height:1.6;color:#475467}.empty{background:#fff;border-radius:16px;padding:25px;font-size:18px;text-align:center}
-@media(max-width:650px){.title{font-size:25px}.summary{grid-template-columns:1fr 1fr}.summary .box:last-child{grid-column:1/-1}.num{font-size:30px}.value{font-size:38px}}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f3f6fa;
+  color:#172033;
+  font-family:Arial,"Noto Sans Thai",sans-serif;
+}
+
+header{
+  background:#fff;
+  border-bottom:1px solid #dfe5ee;
+  padding:18px 16px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.wrap{
+  max-width:1180px;
+  margin:auto;
+}
+
+.title{
+  font-size:30px;
+  font-weight:900;
+}
+
+.sub{
+  font-size:16px;
+  color:#667085;
+  margin-top:5px;
+}
+
+.updated{
+  margin-top:10px;
+  font-size:16px;
+}
+
+.dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#16a34a;
+  margin-right:7px;
+}
+
+main{
+  padding:18px 16px 50px;
+}
+
+.notice{
+  background:#fff8dc;
+  border:1px solid #efd878;
+  border-radius:16px;
+  padding:14px 16px;
+  font-size:17px;
+  line-height:1.5;
+  margin-bottom:16px;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.box{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  border:1px solid #e1e7ef;
+}
+
+.num{
+  font-size:34px;
+  font-weight:900;
+}
+
+.label{
+  font-size:16px;
+  color:#667085;
+  margin-top:3px;
+}
+
+.section-title{
+  font-size:23px;
+  font-weight:900;
+  margin:24px 0 12px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
+  gap:14px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #dfe5ee;
+  border-radius:18px;
+  padding:17px;
+  box-shadow:0 2px 8px rgba(16,24,40,.04);
+}
+
+.card.alert{
+  border:2px solid #ef4444;
+}
+
+.station{
+  font-size:22px;
+  font-weight:900;
+  line-height:1.25;
+}
+
+.place{
+  font-size:15px;
+  color:#667085;
+  margin-top:5px;
+}
+
+.value{
+  font-size:46px;
+  font-weight:900;
+  margin:14px 0 2px;
+}
+
+.unit{
+  font-size:15px;
+  color:#667085;
+}
+
+.status{
+  display:inline-block;
+  margin-top:11px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:16px;
+}
+
+.red{
+  background:#fee2e2;
+  color:#b42318;
+}
+
+.yellow{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.green{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.gray{
+  background:#eef2f7;
+  color:#475467;
+}
+
+.meta{
+  margin-top:13px;
+  border-top:1px solid #edf0f4;
+  padding-top:11px;
+  font-size:15px;
+  line-height:1.65;
+  color:#475467;
+}
+
+.chart{
+  margin-top:12px;
+}
+
+.chart-title{
+  font-size:14px;
+  color:#667085;
+  margin-bottom:5px;
+}
+
+.spark{
+  width:100%;
+  height:54px;
+  display:block;
+  background:#f8fafc;
+  border-radius:9px;
+}
+
+.empty{
+  background:#fff;
+  border-radius:16px;
+  padding:25px;
+  font-size:18px;
+  text-align:center;
+}
+
+.footer{
+  margin-top:25px;
+  color:#667085;
+  font-size:14px;
+  line-height:1.5;
+}
+
+@media(max-width:700px){
+
+  .title{
+    font-size:25px;
+  }
+
+  .summary{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .summary .box:last-child{
+    grid-column:1/-1;
+  }
+
+  .num{
+    font-size:30px;
+  }
+
+  .value{
+    font-size:40px;
+  }
+
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+}
 </style>
 </head>
+
 <body>
-<header><div class="wrap">
-  <div class="title">🌊 สุพรรณบุรี Water Watch</div>
-  <div class="sub">ติดตามระดับน้ำจากสถานีวัดน้ำ — เริ่มเก็บข้อมูลตั้งแต่วันที่เริ่มระบบ</div>
-  <div class="updated"><span class="dot"></span><b id="updated">กำลังโหลดข้อมูล...</b></div>
-</div></header>
+
+<header>
+
+<div class="wrap">
+
+<div class="title">
+🌊 สุพรรณบุรี Water Watch
+</div>
+
+<div class="sub">
+ติดตามระดับน้ำจากสถานีวัดน้ำ จังหวัดสุพรรณบุรี
+</div>
+
+<div class="updated">
+<span class="dot"></span>
+<b id="updated">กำลังโหลดข้อมูล...</b>
+</div>
+
+</div>
+
+</header>
+
+
 <main class="wrap">
-  <div class="notice">หน้านี้เป็นระบบติดตามข้อมูลระดับน้ำจากสถานีตรวจวัด ข้อมูลอาจมีความล่าช้าตามระบบต้นทาง และไม่ใช่ประกาศเตือนภัยอย่างเป็นทางการ</div>
-  <section class="summary">
-    <div class="box"><div class="num" id="total">-</div><div class="label">สถานีที่พบข้อมูล</div></div>
-    <div class="box"><div class="num" id="overflow">-</div><div class="label">สถานีที่แสดงว่า “ล้นตลิ่ง”</div></div>
-    <div class="box"><div class="num" id="started">-</div><div class="label">เริ่มเก็บข้อมูล</div></div>
-  </section>
-  <div id="cards" class="cards"><div class="empty">กำลังโหลด...</div></div>
+
+
+<div class="notice">
+
+ระบบนี้แสดงข้อมูลจากสถานีตรวจวัดน้ำที่ระบบต้นทางส่งมา
+
+ข้อมูลอาจมีความล่าช้า และ
+
+<b>ไม่ใช่ประกาศเตือนภัยอย่างเป็นทางการ</b>
+
+</div>
+
+
+<section class="summary">
+
+<div class="box">
+
+<div class="num" id="total">
+-
+</div>
+
+<div class="label">
+สถานีที่พบข้อมูล
+</div>
+
+</div>
+
+
+<div class="box">
+
+<div class="num" id="overflow">
+-
+</div>
+
+<div class="label">
+สถานีที่ระบุว่า “ล้นตลิ่ง”
+</div>
+
+</div>
+
+
+<div class="box">
+
+<div class="num" id="started">
+-
+</div>
+
+<div class="label">
+เริ่มเก็บข้อมูล
+</div>
+
+</div>
+
+</section>
+
+
+<div class="section-title">
+สถานีล่าสุด
+</div>
+
+
+<div id="cards" class="cards">
+
+<div class="empty">
+กำลังโหลด...
+</div>
+
+</div>
+
+
+<div class="footer">
+
+ระบบเก็บข้อมูลตามรอบที่ GitHub Actions ทำงาน
+และหน้าเว็บจะตรวจข้อมูลใหม่ทุก 5 นาที
+
+</div>
+
 </main>
+
+
 <script>
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function fmtDate(s){if(!s)return '-';return s.replace('T',' ');}
-function classify(s){
-  const t=String(s||'');
-  if(t.includes('ล้นตลิ่ง')) return ['red','ล้นตลิ่ง'];
-  if(t.includes('เฝ้าระวัง')||t.includes('น้ำมาก')) return ['yellow',t];
-  if(!t) return ['gray','ไม่มีข้อความสถานะ'];
-  return ['green',t];
+
+function text(v){
+
+if(v===null || v===undefined || v===''){
+return '';
 }
+
+if(typeof v==='string' || typeof v==='number'){
+return String(v);
+}
+
+if(typeof v==='object'){
+
+return String(
+v.th ??
+v.en ??
+v.name ??
+v.label ??
+Object.values(v)[0] ??
+''
+);
+
+}
+
+return String(v);
+
+}
+
+
+function esc(v){
+
+return text(v).replace(
+/[&<>"']/g,
+c=>({
+
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#039;'
+
+}[c])
+);
+
+}
+
+
+function fmtDate(s){
+
+if(!s){
+return '-';
+}
+
+return String(s).replace('T',' ');
+
+}
+
+
+function classify(status){
+
+const t=text(status);
+
+if(t.includes('ล้นตลิ่ง')){
+
+return[
+'red',
+'🔴 ล้นตลิ่ง'
+];
+
+}
+
+if(
+t.includes('เฝ้าระวัง') ||
+t.includes('น้ำมาก')
+){
+
+return[
+'yellow',
+'🟡 '+t
+];
+
+}
+
+if(!t){
+
+return[
+'gray',
+'ไม่มีข้อความสถานะ'
+];
+
+}
+
+return[
+'green',
+'🟢 '+t
+];
+
+}
+
+
+function num(v){
+
+const n=Number(v);
+
+return Number.isFinite(n)
+?n
+:null;
+
+}
+
+
+function sparkline(
+stationId,
+snapshots
+){
+
+const vals=[];
+
+for(
+const snap of snapshots
+){
+
+for(
+const s of (snap.stations||[])
+){
+
+if(
+String(s.station_id)===
+String(stationId)
+){
+
+const v=
+num(s.waterlevel_msl);
+
+if(v!==null){
+
+vals.push(v);
+
+}
+
+}
+
+}
+
+}
+
+
+if(vals.length<2){
+
+return '';
+
+}
+
+
+const min=
+Math.min(...vals);
+
+const max=
+Math.max(...vals);
+
+const span=
+(max-min)||1;
+
+
+const pts=
+vals.map(
+(v,i)=>{
+
+const x=
+4+i*(292/(vals.length-1));
+
+const y=
+48-((v-min)/span)*38;
+
+return(
+x.toFixed(1)+','+
+y.toFixed(1)
+);
+
+}
+).join(' ');
+
+
+return `
+
+<div class="chart">
+
+<div class="chart-title">
+แนวโน้มระดับน้ำจากข้อมูลที่เก็บได้
+</div>
+
+<svg
+class="spark"
+viewBox="0 0 300 54"
+preserveAspectRatio="none"
+>
+
+<polyline
+points="${pts}"
+fill="none"
+stroke="currentColor"
+stroke-width="3"
+stroke-linecap="round"
+stroke-linejoin="round"
+/>
+
+</svg>
+
+</div>
+
+`;
+
+}
+
+
 async function load(){
-  try{
-    const r=await fetch('data/water.json?ts='+Date.now(),{cache:'no-store'});
-    const d=await r.json();
-    const latest=(d.snapshots||[]).slice(-1)[0];
-    const stations=(latest&&latest.stations)||[];
-    document.getElementById('updated').textContent='ข้อมูลล่าสุด '+fmtDate(latest?.collected_at||d.last_collected_at);
-    document.getElementById('total').textContent=stations.length;
-    document.getElementById('overflow').textContent=stations.filter(x=>String(x.status_text||'').includes('ล้นตลิ่ง')).length;
-    document.getElementById('started').textContent=d.started_at?fmtDate(d.started_at).slice(0,10):'-';
-    if(!stations.length){document.getElementById('cards').innerHTML='<div class="empty">ยังไม่มีข้อมูลสะสม — รอการเก็บข้อมูลรอบแรก</div>';return;}
-    document.getElementById('cards').innerHTML=stations.map(x=>{
-      const [cl,st]=classify(x.status_text);
-      return `<article class="card">
-        <div class="station">${esc(x.name)}</div>
-        <div class="place">${esc(x.district)} ${esc(x.province)}</div>
-        <div class="value">${esc(x.waterlevel_msl)}</div><div class="unit">เมตร (MSL)</div>
-        <div class="status ${cl}">${esc(st)}</div>
-        <div class="meta">
-          เวลาอ่านค่า: <b>${esc(fmtDate(x.waterlevel_datetime))}</b><br>
-          ระยะจากตลิ่ง: <b>${x.diff_wl_bank==null?'-':esc(x.diff_wl_bank)} ม.</b><br>
-          แม่น้ำ/คลอง: ${esc(x.river_name||'-')}
-        </div>
-      </article>`;
-    }).join('');
-  }catch(e){document.getElementById('cards').innerHTML='<div class="empty">โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่</div>';document.getElementById('updated').textContent='ไม่สามารถอ่านข้อมูลได้';}
+
+try{
+
+const r=
+await fetch(
+'data/water.json?ts='+
+Date.now(),
+{
+cache:'no-store'
 }
+);
+
+
+const d=
+await r.json();
+
+
+const snapshots=
+d.snapshots||[];
+
+
+const latest=
+snapshots.at(-1);
+
+
+const stations=
+(latest?.stations||[])
+.slice();
+
+
+stations.sort(
+(a,b)=>{
+
+const ar=
+text(a.status_text)
+.includes('ล้นตลิ่ง')
+?0:1;
+
+const br=
+text(b.status_text)
+.includes('ล้นตลิ่ง')
+?0:1;
+
+
+if(ar!==br){
+
+return ar-br;
+
+}
+
+
+return text(a.name)
+.localeCompare(
+text(b.name),
+'th'
+);
+
+}
+);
+
+
+document.getElementById(
+'updated'
+).textContent=
+'ข้อมูลล่าสุด '+
+fmtDate(
+latest?.collected_at ||
+d.last_collected_at
+);
+
+
+document.getElementById(
+'total'
+).textContent=
+stations.length;
+
+
+document.getElementById(
+'overflow'
+).textContent=
+stations.filter(
+x=>
+text(x.status_text)
+.includes('ล้นตลิ่ง')
+).length;
+
+
+document.getElementById(
+'started'
+).textContent=
+d.started_at
+?fmtDate(
+d.started_at
+).slice(0,10)
+:'-';
+
+
+if(!stations.length){
+
+document.getElementById(
+'cards'
+).innerHTML=
+'<div class="empty">'+
+'ยังไม่มีข้อมูลสะสม — รอการเก็บข้อมูลรอบแรก'+
+'</div>';
+
+return;
+
+}
+
+
+document.getElementById(
+'cards'
+).innerHTML=
+stations.map(
+x=>{
+
+const[
+cl,
+st
+]=classify(
+x.status_text
+);
+
+
+const name=
+text(x.name)||
+'ไม่ระบุสถานี';
+
+
+const district=
+text(x.district);
+
+
+const province=
+text(x.province)||
+'สุพรรณบุรี';
+
+
+const river=
+text(x.river_name)||
+'-';
+
+
+const alertClass=
+cl==='red'
+?' alert'
+:'';
+
+
+return `
+
+<article class="card${alertClass}">
+
+<div class="station">
+${esc(name)}
+</div>
+
+
+<div class="place">
+
+${esc(district)}
+${district?' ':' '}
+${esc(province)}
+
+</div>
+
+
+<div class="value">
+
+${esc(x.waterlevel_msl)}
+
+</div>
+
+
+<div class="unit">
+เมตร (MSL)
+</div>
+
+
+<div class="status ${cl}">
+
+${esc(st)}
+
+</div>
+
+
+<div class="meta">
+
+เวลาอ่านค่า:
+<b>
+${esc(
+fmtDate(
+x.waterlevel_datetime
+)
+)}
+</b>
+
+<br>
+
+
+ระยะจากตลิ่ง:
+<b>
+${
+x.diff_wl_bank==null
+?'-'
+:esc(x.diff_wl_bank)
+}
+ม.
+</b>
+
+<br>
+
+
+แม่น้ำ/คลอง:
+${esc(river)}
+
+</div>
+
+
+${sparkline(
+x.station_id,
+snapshots.slice(-24)
+)}
+
+</article>
+
+`;
+
+}
+).join('');
+
+
+}catch(e){
+
+console.error(e);
+
+document.getElementById(
+'cards'
+).innerHTML=
+'<div class="empty">'+
+'โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่'+
+'</div>';
+
+
+document.getElementById(
+'updated'
+).textContent=
+'ไม่สามารถอ่านข้อมูลได้';
+
+}
+
+}
+
+
 load();
-setInterval(load,5*60*1000);
+
+
+setInterval(
+load,
+5*60*1000
+);
+
 </script>
-</body></html>
+
+</body>
+</html>
