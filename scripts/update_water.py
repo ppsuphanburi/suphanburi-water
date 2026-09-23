@@ -14,6 +14,17 @@ def get_json(url):
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read().decode("utf-8"))
 
+def label(v):
+    if isinstance(v, dict):
+        return str(
+            v.get("th")
+            or v.get("en")
+            or v.get("name")
+            or v.get("label")
+            or next(iter(v.values()), "")
+        )
+    return str(v or "")
+
 raw=get_json(API)
 records=raw.get("data", [])
 rows=[]
@@ -33,25 +44,36 @@ for x in records:
 for x in seen.values():
     geo=x.get("geocode") or {}
     st=x.get("station") or {}
-    rows.append({
-        "station_id": st.get("id"),
-        "name": str(st.get("tele_station_name") or st.get("station_name") or "ไม่ระบุสถานี"),
-        "waterlevel_datetime": x.get("waterlevel_datetime"),
-        "waterlevel_msl": x.get("waterlevel_msl"),
-        "waterlevel_m": x.get("waterlevel_m"),
-        "diff_wl_bank": x.get("diff_wl_bank"),
-        "diff_wl_bank_text": x.get("diff_wl_bank_text"),
-        "status_text": x.get("situation_level") if isinstance(x.get("situation_level"), str) else x.get("diff_wl_bank_text"),
-        "river_name": x.get("river_name"),
-        "district": geo.get("amphoe_name"),
-        "subdistrict": geo.get("tambon_name"),
-        "province": geo.get("province_name"),
-        "latitude": st.get("latitude"),
-        "longitude": st.get("longitude"),
-        "left_bank": st.get("left_bank"),
-        "right_bank": st.get("right_bank"),
-        "min_bank": st.get("min_bank")
-    })
+rows.append({
+    "id": x.get("id"),
+    "datetime": x.get("waterlevel_datetime"),
+
+    "name": label(
+        st.get("tele_station_name")
+        or st.get("station_name")
+        or "ไม่ระบุสถานี"
+    ),
+
+    "district": label(geo.get("amphoe_name")),
+    "subdistrict": label(geo.get("tambon_name")),
+    "province": label(geo.get("province_name")),
+
+    "waterlevel_msl": x.get("waterlevel_msl"),
+    "waterlevel_m": x.get("waterlevel_m"),
+
+    "min_bank": st.get("min_bank"),
+    "diff_wl_bank": x.get("diff_wl_bank"),
+
+    "status_text": label(x.get("diff_wl_bank_text")),
+
+    "river_name": label(x.get("river_name")),
+
+    "lat": st.get("lat"),
+    "long": st.get("long"),
+
+    "station_type": label(x.get("station_type")),
+    "agency": label(x.get("agency")),
+})
 rows.sort(key=lambda x: str(x.get("name") or ""))
 
 if os.path.exists(OUT):
