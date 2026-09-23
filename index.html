@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>สุพรรณบุรี Water Watch</title>
-
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 <style>
 *{box-sizing:border-box}
 
@@ -211,7 +214,127 @@ main{
   font-size:14px;
   line-height:1.5;
 }
+.map-section{
+  margin-top:24px;
+  background:#fff;
+  border:1px solid #dfe5ee;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 2px 8px rgba(16,24,40,.04);
+}
 
+.map-title{
+  font-size:23px;
+  font-weight:900;
+  margin-bottom:5px;
+}
+
+.map-subtitle{
+  color:#667085;
+  font-size:15px;
+  margin-bottom:12px;
+}
+
+#waterMap{
+  width:100%;
+  height:480px;
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.map-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:12px;
+  font-size:15px;
+  font-weight:700;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.legend-dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  display:inline-block;
+  border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.25);
+}
+
+.legend-red{background:#dc2626}
+.legend-yellow{background:#f59e0b}
+.legend-green{background:#16a34a}
+
+.water-marker{
+  width:26px;
+  height:26px;
+  border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);
+  border:3px solid #fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+
+.water-marker span{
+  display:block;
+  width:8px;
+  height:8px;
+  background:#fff;
+  border-radius:50%;
+  position:absolute;
+  left:6px;
+  top:6px;
+}
+
+.leaflet-popup-content{
+  font-family:Arial,"Noto Sans Thai",sans-serif;
+  font-size:16px;
+  line-height:1.6;
+}
+
+.popup-name{
+  font-size:20px;
+  font-weight:900;
+  color:#172033;
+}
+
+.popup-value{
+  font-size:30px;
+  font-weight:900;
+}
+
+.popup-status{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:900;
+  margin:4px 0;
+}
+
+.popup-red{
+  background:#fee2e2;
+  color:#b42318;
+}
+
+.popup-yellow{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.popup-green{
+  background:#dcfce7;
+  color:#166534;
+}
+
+@media(max-width:700px){
+  #waterMap{
+    height:380px;
+  }
+}
 @media(max-width:700px){
 
   .title{
@@ -322,7 +445,38 @@ main{
 
 </section>
 
+<section class="map-section">
 
+  <div class="map-title">
+    🗺️ แผนที่สถานีระดับน้ำ จังหวัดสุพรรณบุรี
+  </div>
+
+  <div class="map-subtitle">
+    กดจุดสถานีเพื่อดูระดับน้ำและสถานะล่าสุด
+  </div>
+
+  <div id="waterMap"></div>
+
+  <div class="map-legend">
+
+    <div class="legend-item">
+      <span class="legend-dot legend-red"></span>
+      ล้นตลิ่ง
+    </div>
+
+    <div class="legend-item">
+      <span class="legend-dot legend-yellow"></span>
+      เฝ้าระวัง
+    </div>
+
+    <div class="legend-item">
+      <span class="legend-dot legend-green"></span>
+      ปกติ
+    </div>
+
+  </div>
+
+</section>
 <div class="section-title">
 สถานีล่าสุด
 </div>
@@ -347,8 +501,8 @@ main{
 </main>
 
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-
 function text(v){
 
 if(v===null || v===undefined || v===''){
@@ -475,7 +629,7 @@ const s of (snap.stations||[])
 ){
 
 if(
-String(s.station_id)===
+String(s.id)===
 String(stationId)
 ){
 
@@ -562,7 +716,186 @@ stroke-linejoin="round"
 
 }
 
+let waterMap = null;
+let mapMarkers = [];
 
+function statusInfo(status){
+
+  const t = text(status);
+
+  if(t.includes('ล้นตลิ่ง')){
+    return {
+      color:'#dc2626',
+      cls:'popup-red',
+      text:'ล้นตลิ่ง'
+    };
+  }
+
+  if(
+    t.includes('เฝ้าระวัง') ||
+    t.includes('น้ำมาก')
+  ){
+    return {
+      color:'#f59e0b',
+      cls:'popup-yellow',
+      text:t || 'เฝ้าระวัง'
+    };
+  }
+
+  return {
+    color:'#16a34a',
+    cls:'popup-green',
+    text:t || 'ปกติ'
+  };
+}
+
+
+function initMap(){
+
+  if(waterMap) return;
+
+  waterMap = L.map('waterMap').setView(
+    [14.4745,100.1177],
+    9
+  );
+
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      maxZoom:18,
+      attribution:'© OpenStreetMap contributors'
+    }
+  ).addTo(waterMap);
+}
+
+
+function updateMap(stations){
+
+  initMap();
+
+  mapMarkers.forEach(m => {
+    waterMap.removeLayer(m);
+  });
+
+  mapMarkers = [];
+
+  const bounds = [];
+
+  stations.forEach(x => {
+
+    const lat = Number(x.lat);
+    const lng = Number(x.long);
+
+    if(
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lng)
+    ){
+      return;
+    }
+
+    const info = statusInfo(x.status_text);
+
+    const markerIcon = L.divIcon({
+
+      className:'water-marker-wrap',
+
+      html:
+        '<div class="water-marker" ' +
+        'style="background:'+info.color+'">' +
+        '<span></span>' +
+        '</div>',
+
+      iconSize:[26,26],
+
+      iconAnchor:[13,26],
+
+      popupAnchor:[0,-24]
+    });
+
+
+    const marker = L.marker(
+      [lat,lng],
+      {icon:markerIcon}
+    ).addTo(waterMap);
+
+
+    const name =
+      text(x.name) ||
+      'ไม่ระบุสถานี';
+
+    const district =
+      text(x.district);
+
+    const water =
+      x.waterlevel_msl == null
+      ? '-'
+      : Number(x.waterlevel_msl).toFixed(2);
+
+    const diff =
+      x.diff_wl_bank == null
+      ? '-'
+      : Number(x.diff_wl_bank).toFixed(2);
+
+    const time =
+      text(x.datetime) || '-';
+
+    const river =
+      text(x.river_name) || '-';
+
+
+    marker.bindPopup(`
+      <div class="popup-name">
+        ${esc(name)}
+      </div>
+
+      <div>
+        ${esc(district)}
+        ${district ? ' จ.สุพรรณบุรี' : ''}
+      </div>
+
+      <div class="popup-value">
+        ${esc(water)} ม.
+      </div>
+
+      <div class="popup-status ${info.cls}">
+        ${esc(info.text)}
+      </div>
+
+      <div>
+        สูง/ต่ำกว่าตลิ่ง:
+        <b>${esc(diff)} ม.</b>
+      </div>
+
+      <div>
+        แม่น้ำ/คลอง:
+        ${esc(river)}
+      </div>
+
+      <div>
+        อัปเดต:
+        ${esc(time)}
+      </div>
+    `);
+
+
+    mapMarkers.push(marker);
+
+    bounds.push([lat,lng]);
+  });
+
+
+  if(bounds.length){
+
+    waterMap.fitBounds(
+      bounds,
+      {
+        padding:[30,30],
+        maxZoom:10
+      }
+    );
+
+  }
+}
 async function load(){
 
 try{
@@ -593,6 +926,7 @@ const stations=
 (latest?.stations||[])
 .slice();
 
+  updateMap(stations);
 
 stations.sort(
 (a,b)=>{
@@ -756,9 +1090,7 @@ ${esc(st)}
 เวลาอ่านค่า:
 <b>
 ${esc(
-fmtDate(
-x.waterlevel_datetime
-)
+fmtDate(x.datetime)
 )}
 </b>
 
@@ -785,7 +1117,7 @@ ${esc(river)}
 
 
 ${sparkline(
-x.station_id,
+x.id,
 snapshots.slice(-24)
 )}
 
