@@ -1,16 +1,22 @@
 <!doctype html>
 <html lang="th">
+
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>สุพรรณบุรี Water Watch</title>
+
 <link
   rel="stylesheet"
   href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 />
+
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -25,7 +31,7 @@ header{
   padding:18px 16px;
   position:sticky;
   top:0;
-  z-index:10;
+  z-index:1000;
 }
 
 .wrap{
@@ -214,6 +220,12 @@ main{
   font-size:14px;
   line-height:1.5;
 }
+
+
+/* =========================
+   MAP
+========================= */
+
 .map-section{
   margin-top:24px;
   background:#fff;
@@ -232,7 +244,18 @@ main{
 .map-subtitle{
   color:#667085;
   font-size:15px;
-  margin-bottom:12px;
+  margin-bottom:10px;
+}
+
+.map-count{
+  display:inline-block;
+  background:#eef6ff;
+  color:#1457a6;
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:15px;
+  font-weight:900;
+  margin-bottom:10px;
 }
 
 #waterMap{
@@ -240,12 +263,13 @@ main{
   height:480px;
   border-radius:14px;
   overflow:hidden;
+  border:1px solid #dfe5ee;
 }
 
 .map-legend{
   display:flex;
   flex-wrap:wrap;
-  gap:10px;
+  gap:12px;
   margin-top:12px;
   font-size:15px;
   font-weight:700;
@@ -266,29 +290,72 @@ main{
   box-shadow:0 1px 4px rgba(0,0,0,.25);
 }
 
-.legend-red{background:#dc2626}
-.legend-yellow{background:#f59e0b}
-.legend-green{background:#16a34a}
+.legend-red{
+  background:#dc2626;
+}
+
+.legend-yellow{
+  background:#f59e0b;
+}
+
+.legend-green{
+  background:#16a34a;
+}
+
+
+/* =========================
+   WATER MARKER
+========================= */
+
+.water-marker-wrap{
+  background:transparent !important;
+  border:0 !important;
+}
 
 .water-marker{
-  width:26px;
-  height:26px;
-  border-radius:50% 50% 50% 0;
-  transform:rotate(-45deg);
-  border:3px solid #fff;
-  box-shadow:0 2px 8px rgba(0,0,0,.35);
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  border:4px solid #fff;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.45),
+    0 0 0 2px rgba(0,0,0,.15);
+  position:relative;
 }
 
 .water-marker span{
   display:block;
-  width:8px;
-  height:8px;
+  width:9px;
+  height:9px;
   background:#fff;
   border-radius:50%;
   position:absolute;
-  left:6px;
-  top:6px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
 }
+
+
+/* ชื่อสถานีบนแผนที่ */
+
+.station-label{
+  background:#fff !important;
+  border:2px solid #344054 !important;
+  border-radius:8px !important;
+  padding:4px 7px !important;
+  color:#172033 !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  box-shadow:0 2px 7px rgba(0,0,0,.25) !important;
+  white-space:nowrap;
+}
+
+.station-label:before{
+  border-top-color:#344054 !important;
+}
+
+
+/* popup */
 
 .leaflet-popup-content{
   font-family:Arial,"Noto Sans Thai",sans-serif;
@@ -330,11 +397,9 @@ main{
   color:#166534;
 }
 
-@media(max-width:700px){
-  #waterMap{
-    height:380px;
-  }
-}
+
+/* mobile */
+
 @media(max-width:700px){
 
   .title{
@@ -361,9 +426,20 @@ main{
     grid-template-columns:1fr;
   }
 
+  #waterMap{
+    height:400px;
+  }
+
+  .station-label{
+    font-size:11px !important;
+    padding:3px 5px !important;
+  }
+
 }
+
 </style>
 </head>
+
 
 <body>
 
@@ -445,38 +521,49 @@ main{
 
 </section>
 
+
+<!-- =========================
+     MAP
+========================= -->
+
 <section class="map-section">
 
-  <div class="map-title">
-    🗺️ แผนที่สถานีระดับน้ำ จังหวัดสุพรรณบุรี
-  </div>
+<div class="map-title">
+🗺️ แผนที่สถานีระดับน้ำ จังหวัดสุพรรณบุรี
+</div>
 
-  <div class="map-subtitle">
-    กดจุดสถานีเพื่อดูระดับน้ำและสถานะล่าสุด
-  </div>
+<div class="map-subtitle">
+กดจุดสถานีเพื่อดูระดับน้ำและสถานะล่าสุด
+</div>
 
-  <div id="waterMap"></div>
+<div class="map-count" id="mapCount">
+กำลังอ่านข้อมูลสถานี...
+</div>
 
-  <div class="map-legend">
+<div id="waterMap"></div>
 
-    <div class="legend-item">
-      <span class="legend-dot legend-red"></span>
-      ล้นตลิ่ง
-    </div>
+<div class="map-legend">
 
-    <div class="legend-item">
-      <span class="legend-dot legend-yellow"></span>
-      เฝ้าระวัง
-    </div>
+<div class="legend-item">
+<span class="legend-dot legend-red"></span>
+ล้นตลิ่ง
+</div>
 
-    <div class="legend-item">
-      <span class="legend-dot legend-green"></span>
-      ปกติ
-    </div>
+<div class="legend-item">
+<span class="legend-dot legend-yellow"></span>
+เฝ้าระวัง
+</div>
 
-  </div>
+<div class="legend-item">
+<span class="legend-dot legend-green"></span>
+ปกติ
+</div>
+
+</div>
 
 </section>
+
+
 <div class="section-title">
 สถานีล่าสุด
 </div>
@@ -498,248 +585,155 @@ main{
 
 </div>
 
+
 </main>
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+
+
+/* =========================
+   HELPERS
+========================= */
+
 function text(v){
 
-if(v===null || v===undefined || v===''){
-return '';
-}
+  if(v===null || v===undefined || v===''){
+    return '';
+  }
 
-if(typeof v==='string' || typeof v==='number'){
-return String(v);
-}
+  if(typeof v==='string' || typeof v==='number'){
+    return String(v);
+  }
 
-if(typeof v==='object'){
+  if(typeof v==='object'){
 
-return String(
-v.th ??
-v.en ??
-v.name ??
-v.label ??
-Object.values(v)[0] ??
-''
-);
+    return String(
+      v.th ??
+      v.en ??
+      v.name ??
+      v.label ??
+      Object.values(v)[0] ??
+      ''
+    );
 
-}
+  }
 
-return String(v);
-
+  return String(v);
 }
 
 
 function esc(v){
 
-return text(v).replace(
-/[&<>"']/g,
-c=>({
-
-'&':'&amp;',
-'<':'&lt;',
-'>':'&gt;',
-'"':'&quot;',
-"'":'&#039;'
-
-}[c])
-);
+  return text(v).replace(
+    /[&<>"']/g,
+    c => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#039;'
+    }[c])
+  );
 
 }
 
 
 function fmtDate(s){
 
-if(!s){
-return '-';
-}
+  if(!s){
+    return '-';
+  }
 
-return String(s).replace('T',' ');
-
-}
-
-
-function classify(status){
-
-const t=text(status);
-
-if(t.includes('ล้นตลิ่ง')){
-
-return[
-'red',
-'🔴 ล้นตลิ่ง'
-];
-
-}
-
-if(
-t.includes('เฝ้าระวัง') ||
-t.includes('น้ำมาก')
-){
-
-return[
-'yellow',
-'🟡 '+t
-];
-
-}
-
-if(!t){
-
-return[
-'gray',
-'ไม่มีข้อความสถานะ'
-];
-
-}
-
-return[
-'green',
-'🟢 '+t
-];
+  return String(s).replace('T',' ');
 
 }
 
 
 function num(v){
 
-const n=Number(v);
+  const n = Number(v);
 
-return Number.isFinite(n)
-?n
-:null;
-
-}
-
-
-function sparkline(
-stationId,
-snapshots
-){
-
-const vals=[];
-
-for(
-const snap of snapshots
-){
-
-for(
-const s of (snap.stations||[])
-){
-
-if(
-String(s.id)===
-String(stationId)
-){
-
-const v=
-num(s.waterlevel_msl);
-
-if(v!==null){
-
-vals.push(v);
-
-}
-
-}
-
-}
+  return Number.isFinite(n)
+    ? n
+    : null;
 
 }
 
 
-if(vals.length<2){
+/* =========================
+   STATUS
+========================= */
 
-return '';
-
-}
-
-
-const min=
-Math.min(...vals);
-
-const max=
-Math.max(...vals);
-
-const span=
-(max-min)||1;
-
-
-const pts=
-vals.map(
-(v,i)=>{
-
-const x=
-4+i*(292/(vals.length-1));
-
-const y=
-48-((v-min)/span)*38;
-
-return(
-x.toFixed(1)+','+
-y.toFixed(1)
-);
-
-}
-).join(' ');
-
-
-return `
-
-<div class="chart">
-
-<div class="chart-title">
-แนวโน้มระดับน้ำจากข้อมูลที่เก็บได้
-</div>
-
-<svg
-class="spark"
-viewBox="0 0 300 54"
-preserveAspectRatio="none"
->
-
-<polyline
-points="${pts}"
-fill="none"
-stroke="currentColor"
-stroke-width="3"
-stroke-linecap="round"
-stroke-linejoin="round"
-/>
-
-</svg>
-
-</div>
-
-`;
-
-}
-
-let waterMap = null;
-let mapMarkers = [];
-
-function statusInfo(status){
+function classify(status){
 
   const t = text(status);
 
   if(t.includes('ล้นตลิ่ง')){
-    return {
-      color:'#dc2626',
-      cls:'popup-red',
-      text:'ล้นตลิ่ง'
-    };
+
+    return [
+      'red',
+      '🔴 ล้นตลิ่ง'
+    ];
+
   }
 
   if(
     t.includes('เฝ้าระวัง') ||
     t.includes('น้ำมาก')
   ){
+
+    return [
+      'yellow',
+      '🟡 '+t
+    ];
+
+  }
+
+  if(!t){
+
+    return [
+      'gray',
+      'ไม่มีข้อความสถานะ'
+    ];
+
+  }
+
+  return [
+    'green',
+    '🟢 '+t
+  ];
+
+}
+
+
+function statusInfo(status){
+
+  const t = text(status);
+
+  if(t.includes('ล้นตลิ่ง')){
+
+    return {
+      color:'#dc2626',
+      cls:'popup-red',
+      text:'ล้นตลิ่ง'
+    };
+
+  }
+
+  if(
+    t.includes('เฝ้าระวัง') ||
+    t.includes('น้ำมาก')
+  ){
+
     return {
       color:'#f59e0b',
       cls:'popup-yellow',
       text:t || 'เฝ้าระวัง'
     };
+
   }
 
   return {
@@ -747,17 +741,160 @@ function statusInfo(status){
     cls:'popup-green',
     text:t || 'ปกติ'
   };
+
 }
+
+
+/* =========================
+   SPARKLINE
+========================= */
+
+function sparkline(
+  stationId,
+  snapshots
+){
+
+  const vals=[];
+
+  for(const snap of snapshots){
+
+    for(const s of (snap.stations || [])){
+
+      if(
+        String(s.id) ===
+        String(stationId)
+      ){
+
+        const v =
+          num(s.waterlevel_msl);
+
+        if(v!==null){
+          vals.push(v);
+        }
+
+      }
+
+    }
+
+  }
+
+
+  if(vals.length < 2){
+    return '';
+  }
+
+
+  const min =
+    Math.min(...vals);
+
+  const max =
+    Math.max(...vals);
+
+  const span =
+    (max-min) || 1;
+
+
+  const pts =
+    vals.map((v,i)=>{
+
+      const x =
+        4 +
+        i *
+        (292/(vals.length-1));
+
+      const y =
+        48 -
+        ((v-min)/span)*38;
+
+      return (
+        x.toFixed(1)+','+
+        y.toFixed(1)
+      );
+
+    }).join(' ');
+
+
+  return `
+
+  <div class="chart">
+
+    <div class="chart-title">
+      แนวโน้มระดับน้ำจากข้อมูลที่เก็บได้
+    </div>
+
+    <svg
+      class="spark"
+      viewBox="0 0 300 54"
+      preserveAspectRatio="none"
+    >
+
+      <polyline
+        points="${pts}"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+
+    </svg>
+
+  </div>
+
+  `;
+
+}
+
+
+/* =========================
+   MAP
+========================= */
+
+let waterMap = null;
+
+let mapMarkers = [];
+
+
+/*
+  ขอบเขตคร่าว ๆ ของจังหวัดสุพรรณบุรี
+  ใช้ควบคุมมุมมองแผนที่
+*/
+
+const SUPHAN_BURI_BOUNDS = [
+  [13.95,99.65],
+  [15.10,100.55]
+];
 
 
 function initMap(){
 
-  if(waterMap) return;
+  if(waterMap){
+    return;
+  }
 
-  waterMap = L.map('waterMap').setView(
-    [14.4745,100.1177],
-    9
+
+  waterMap =
+    L.map('waterMap',{
+      zoomControl:true,
+      scrollWheelZoom:true
+    });
+
+
+  /*
+    ตั้งมุมมองเริ่มต้น
+  */
+
+  waterMap.fitBounds(
+    SUPHAN_BURI_BOUNDS,
+    {
+      padding:[10,10]
+    }
   );
+
+
+  /*
+    แผนที่ OpenStreetMap
+  */
 
   L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -766,84 +903,182 @@ function initMap(){
       attribution:'© OpenStreetMap contributors'
     }
   ).addTo(waterMap);
+
 }
 
+
+/* =========================
+   UPDATE MAP
+========================= */
 
 function updateMap(stations){
 
   initMap();
 
-  mapMarkers.forEach(m => {
-    waterMap.removeLayer(m);
+
+  /*
+    ลบหมุดเก่า
+  */
+
+  mapMarkers.forEach(marker=>{
+    waterMap.removeLayer(marker);
   });
 
-  mapMarkers = [];
+  mapMarkers=[];
 
-  const bounds = [];
 
-  stations.forEach(x => {
+  const bounds=[];
 
-    const lat = Number(x.lat);
-    const lng = Number(x.long);
+  let validCount=0;
+
+
+  stations.forEach(x=>{
+
+    /*
+      รองรับทั้ง
+
+      lat / long
+
+      และ
+
+      latitude / longitude
+    */
+
+    const lat =
+      Number(
+        x.lat ??
+        x.latitude
+      );
+
+    const lng =
+      Number(
+        x.long ??
+        x.longitude ??
+        x.lng
+      );
+
+
+    /*
+      ตรวจพิกัด
+    */
 
     if(
       !Number.isFinite(lat) ||
       !Number.isFinite(lng)
     ){
+
+      console.warn(
+        'สถานีไม่มีพิกัด:',
+        x
+      );
+
       return;
+
     }
 
-    const info = statusInfo(x.status_text);
 
-    const markerIcon = L.divIcon({
+    /*
+      ตรวจช่วงพิกัดประเทศไทย
+    */
 
-      className:'water-marker-wrap',
+    if(
+      lat < 5 ||
+      lat > 21 ||
+      lng < 97 ||
+      lng > 106
+    ){
 
-      html:
-        '<div class="water-marker" ' +
-        'style="background:'+info.color+'">' +
-        '<span></span>' +
-        '</div>',
+      console.warn(
+        'พิกัดผิดปกติ:',
+        lat,
+        lng,
+        x
+      );
 
-      iconSize:[26,26],
+      return;
 
-      iconAnchor:[13,26],
-
-      popupAnchor:[0,-24]
-    });
+    }
 
 
-    const marker = L.marker(
-      [lat,lng],
-      {icon:markerIcon}
-    ).addTo(waterMap);
+    validCount++;
+
+
+    const info =
+      statusInfo(x.status_text);
+
+
+    /*
+      สร้างหมุด
+    */
+
+    const markerIcon =
+      L.divIcon({
+
+        className:
+          'water-marker-wrap',
+
+        html:
+          '<div class="water-marker" ' +
+          'style="background:' +
+          info.color +
+          '">' +
+          '<span></span>' +
+          '</div>',
+
+        iconSize:[30,30],
+
+        iconAnchor:[15,15],
+
+        popupAnchor:[0,-15]
+
+      });
+
+
+    const marker =
+      L.marker(
+        [lat,lng],
+        {
+          icon:markerIcon,
+          title:text(x.name)
+        }
+      ).addTo(waterMap);
 
 
     const name =
       text(x.name) ||
       'ไม่ระบุสถานี';
 
+
     const district =
       text(x.district);
 
+
     const water =
       x.waterlevel_msl == null
-      ? '-'
-      : Number(x.waterlevel_msl).toFixed(2);
+        ? '-'
+        : Number(x.waterlevel_msl).toFixed(2);
+
 
     const diff =
       x.diff_wl_bank == null
-      ? '-'
-      : Number(x.diff_wl_bank).toFixed(2);
+        ? '-'
+        : Number(x.diff_wl_bank).toFixed(2);
+
 
     const time =
       text(x.datetime) || '-';
+
 
     const river =
       text(x.river_name) || '-';
 
 
+    /*
+      Popup
+    */
+
     marker.bindPopup(`
+
       <div class="popup-name">
         ${esc(name)}
       </div>
@@ -875,288 +1110,426 @@ function updateMap(stations){
         อัปเดต:
         ${esc(time)}
       </div>
+
     `);
+
+
+    /*
+      แสดงชื่อสถานีตลอดเวลา
+    */
+
+    marker.bindTooltip(
+      esc(name),
+      {
+        permanent:true,
+        direction:'top',
+        offset:[0,-12],
+        className:'station-label',
+        opacity:1
+      }
+    );
 
 
     mapMarkers.push(marker);
 
     bounds.push([lat,lng]);
+
   });
 
+
+  /*
+    แสดงจำนวนสถานีที่มีพิกัด
+  */
+
+  const mapCount =
+    document.getElementById(
+      'mapCount'
+    );
+
+
+  if(mapCount){
+
+    mapCount.textContent =
+      '📍 แสดงสถานี ' +
+      validCount +
+      ' แห่ง';
+
+  }
+
+
+  /*
+    ถ้ามีหมุด ให้ปรับแผนที่ตามหมุด
+  */
 
   if(bounds.length){
 
     waterMap.fitBounds(
       bounds,
       {
-        padding:[30,30],
+        padding:[45,45],
         maxZoom:10
       }
     );
 
   }
+
+
+  /*
+    บังคับให้ Leaflet คำนวณขนาดใหม่
+    ป้องกันกรณีแผนที่อยู่ใน section
+  */
+
+  setTimeout(()=>{
+    waterMap.invalidateSize();
+  },300);
+
 }
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
 async function load(){
 
-try{
+  try{
 
-const r=
-await fetch(
-'data/water.json?ts='+
-Date.now(),
-{
-cache:'no-store'
+    const r =
+      await fetch(
+        'data/water.json?ts='+
+        Date.now(),
+        {
+          cache:'no-store'
+        }
+      );
+
+
+    if(!r.ok){
+
+      throw new Error(
+        'HTTP '+r.status
+      );
+
+    }
+
+
+    const d =
+      await r.json();
+
+
+    const snapshots =
+      d.snapshots || [];
+
+
+    if(!snapshots.length){
+
+      throw new Error(
+        'ไม่พบ snapshots'
+      );
+
+    }
+
+
+    const latest =
+      snapshots.at(-1);
+
+
+    const stations =
+      (latest?.stations || [])
+      .slice();
+
+
+    /*
+      อัปเดตแผนที่ก่อน
+    */
+
+    updateMap(stations);
+
+
+    /*
+      เรียงสถานี
+      ล้นตลิ่งขึ้นก่อน
+    */
+
+    stations.sort(
+      (a,b)=>{
+
+        const ar =
+          text(a.status_text)
+          .includes('ล้นตลิ่ง')
+            ? 0
+            : 1;
+
+
+        const br =
+          text(b.status_text)
+          .includes('ล้นตลิ่ง')
+            ? 0
+            : 1;
+
+
+        if(ar!==br){
+          return ar-br;
+        }
+
+
+        return text(a.name)
+          .localeCompare(
+            text(b.name),
+            'th'
+          );
+
+      }
+    );
+
+
+    /*
+      วันที่อัปเดต
+    */
+
+    document.getElementById(
+      'updated'
+    ).textContent =
+      'ข้อมูลล่าสุด '+
+      fmtDate(
+        latest?.collected_at ||
+        d.last_collected_at
+      );
+
+
+    /*
+      จำนวนสถานี
+    */
+
+    document.getElementById(
+      'total'
+    ).textContent =
+      stations.length;
+
+
+    /*
+      จำนวนสถานีล้นตลิ่ง
+    */
+
+    document.getElementById(
+      'overflow'
+    ).textContent =
+      stations.filter(
+        x =>
+          text(x.status_text)
+          .includes('ล้นตลิ่ง')
+      ).length;
+
+
+    /*
+      วันเริ่มเก็บข้อมูล
+    */
+
+    document.getElementById(
+      'started'
+    ).textContent =
+      d.started_at
+        ? fmtDate(
+            d.started_at
+          ).slice(0,10)
+        : '-';
+
+
+    /*
+      ไม่มีสถานี
+    */
+
+    if(!stations.length){
+
+      document.getElementById(
+        'cards'
+      ).innerHTML =
+        '<div class="empty">'+
+        'ยังไม่มีข้อมูลสะสม — รอการเก็บข้อมูลรอบแรก'+
+        '</div>';
+
+      return;
+
+    }
+
+
+    /*
+      สร้างการ์ดสถานี
+    */
+
+    document.getElementById(
+      'cards'
+    ).innerHTML =
+
+      stations.map(x=>{
+
+        const [
+          cl,
+          st
+        ] =
+          classify(
+            x.status_text
+          );
+
+
+        const name =
+          text(x.name) ||
+          'ไม่ระบุสถานี';
+
+
+        const district =
+          text(x.district);
+
+
+        const province =
+          text(x.province) ||
+          'สุพรรณบุรี';
+
+
+        const river =
+          text(x.river_name) ||
+          '-';
+
+
+        const alertClass =
+          cl === 'red'
+            ? ' alert'
+            : '';
+
+
+        return `
+
+        <article class="card${alertClass}">
+
+          <div class="station">
+            ${esc(name)}
+          </div>
+
+
+          <div class="place">
+
+            ${esc(district)}
+            ${district ? ' ' : ''}
+            ${esc(province)}
+
+          </div>
+
+
+          <div class="value">
+
+            ${esc(x.waterlevel_msl)}
+
+          </div>
+
+
+          <div class="unit">
+            เมตร (MSL)
+          </div>
+
+
+          <div class="status ${cl}">
+
+            ${esc(st)}
+
+          </div>
+
+
+          <div class="meta">
+
+            เวลาอ่านค่า:
+            <b>
+              ${esc(
+                fmtDate(x.datetime)
+              )}
+            </b>
+
+            <br>
+
+            ระยะจากตลิ่ง:
+            <b>
+              ${
+                x.diff_wl_bank == null
+                  ? '-'
+                  : esc(x.diff_wl_bank)
+              }
+              ม.
+            </b>
+
+            <br>
+
+            แม่น้ำ/คลอง:
+            ${esc(river)}
+
+          </div>
+
+
+          ${sparkline(
+            x.id,
+            snapshots.slice(-24)
+          )}
+
+        </article>
+
+        `;
+
+      }).join('');
+
+
+  }
+  catch(e){
+
+    console.error(
+      'โหลดข้อมูลไม่สำเร็จ:',
+      e
+    );
+
+
+    document.getElementById(
+      'cards'
+    ).innerHTML =
+      '<div class="empty">'+
+      'โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่'+
+      '</div>';
+
+
+    document.getElementById(
+      'updated'
+    ).textContent =
+      'ไม่สามารถอ่านข้อมูลได้';
+
+
+    const mapCount =
+      document.getElementById(
+        'mapCount'
+      );
+
+
+    if(mapCount){
+
+      mapCount.textContent =
+        '⚠️ ไม่สามารถอ่านข้อมูลสถานีได้';
+
+    }
+
+  }
+
 }
-);
 
 
-const d=
-await r.json();
-
-
-const snapshots=
-d.snapshots||[];
-
-
-const latest=
-snapshots.at(-1);
-
-
-const stations=
-(latest?.stations||[])
-.slice();
-
-  updateMap(stations);
-
-stations.sort(
-(a,b)=>{
-
-const ar=
-text(a.status_text)
-.includes('ล้นตลิ่ง')
-?0:1;
-
-const br=
-text(b.status_text)
-.includes('ล้นตลิ่ง')
-?0:1;
-
-
-if(ar!==br){
-
-return ar-br;
-
-}
-
-
-return text(a.name)
-.localeCompare(
-text(b.name),
-'th'
-);
-
-}
-);
-
-
-document.getElementById(
-'updated'
-).textContent=
-'ข้อมูลล่าสุด '+
-fmtDate(
-latest?.collected_at ||
-d.last_collected_at
-);
-
-
-document.getElementById(
-'total'
-).textContent=
-stations.length;
-
-
-document.getElementById(
-'overflow'
-).textContent=
-stations.filter(
-x=>
-text(x.status_text)
-.includes('ล้นตลิ่ง')
-).length;
-
-
-document.getElementById(
-'started'
-).textContent=
-d.started_at
-?fmtDate(
-d.started_at
-).slice(0,10)
-:'-';
-
-
-if(!stations.length){
-
-document.getElementById(
-'cards'
-).innerHTML=
-'<div class="empty">'+
-'ยังไม่มีข้อมูลสะสม — รอการเก็บข้อมูลรอบแรก'+
-'</div>';
-
-return;
-
-}
-
-
-document.getElementById(
-'cards'
-).innerHTML=
-stations.map(
-x=>{
-
-const[
-cl,
-st
-]=classify(
-x.status_text
-);
-
-
-const name=
-text(x.name)||
-'ไม่ระบุสถานี';
-
-
-const district=
-text(x.district);
-
-
-const province=
-text(x.province)||
-'สุพรรณบุรี';
-
-
-const river=
-text(x.river_name)||
-'-';
-
-
-const alertClass=
-cl==='red'
-?' alert'
-:'';
-
-
-return `
-
-<article class="card${alertClass}">
-
-<div class="station">
-${esc(name)}
-</div>
-
-
-<div class="place">
-
-${esc(district)}
-${district?' ':' '}
-${esc(province)}
-
-</div>
-
-
-<div class="value">
-
-${esc(x.waterlevel_msl)}
-
-</div>
-
-
-<div class="unit">
-เมตร (MSL)
-</div>
-
-
-<div class="status ${cl}">
-
-${esc(st)}
-
-</div>
-
-
-<div class="meta">
-
-เวลาอ่านค่า:
-<b>
-${esc(
-fmtDate(x.datetime)
-)}
-</b>
-
-<br>
-
-
-ระยะจากตลิ่ง:
-<b>
-${
-x.diff_wl_bank==null
-?'-'
-:esc(x.diff_wl_bank)
-}
-ม.
-</b>
-
-<br>
-
-
-แม่น้ำ/คลอง:
-${esc(river)}
-
-</div>
-
-
-${sparkline(
-x.id,
-snapshots.slice(-24)
-)}
-
-</article>
-
-`;
-
-}
-).join('');
-
-
-}catch(e){
-
-console.error(e);
-
-document.getElementById(
-'cards'
-).innerHTML=
-'<div class="empty">'+
-'โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่'+
-'</div>';
-
-
-document.getElementById(
-'updated'
-).textContent=
-'ไม่สามารถอ่านข้อมูลได้';
-
-}
-
-}
-
+/* =========================
+   START
+========================= */
 
 load();
 
 
+/*
+  ตรวจข้อมูลใหม่ทุก 5 นาที
+*/
+
 setInterval(
-load,
-5*60*1000
+  load,
+  5*60*1000
 );
 
 </script>
