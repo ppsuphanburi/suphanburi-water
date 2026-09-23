@@ -52,7 +52,7 @@ for x in seen.values():
         "right_bank": st.get("right_bank"),
         "min_bank": st.get("min_bank")
     })
-rows.sort(key=lambda x: (x["name"] or ""))
+rows.sort(key=lambda x: str(x.get("name") or ""))
 
 if os.path.exists(OUT):
     with open(OUT,"r",encoding="utf-8") as f:
